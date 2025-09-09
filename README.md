@@ -1,2 +1,192 @@
-# 2025-Promotional-video
-학교 홍보 영상
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>창원남중학교 홍보 영상</title>
+  <meta name="description" content="창원남중학교를 소개합니다"/>
+  <style>
+    :root { --bg:#0b1220; --card:#0f172a; --ink:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; }
+    *{box-sizing:border-box} body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif; background:var(--bg); color:var(--ink)}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand h1{font-size:clamp(18px,3vw,28px);margin:0}
+    .badge{padding:4px 10px;background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.4);border-radius:999px;font-size:12px}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    .toolbar input{background:#0b132b;border:1px solid #1f2a44;color:var(--ink);padding:10px 12px;border-radius:10px;min-width:220px}
+    .toolbar select{background:#0b132b;border:1px solid #1f2a44;color:var(--ink);padding:10px 12px;border-radius:10px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 12;background:var(--card);border:1px solid #1e293b;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+    @media (min-width:680px){.card{grid-column:span 6}}
+    @media (min-width:980px){.card{grid-column:span 4}}
+    .hero-card{grid-column:span 12}
+    .thumb{position:relative;aspect-ratio:16/9;background:#0b132b}
+    .thumb video{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .pin{position:absolute;top:10px;left:10px;background:rgba(250,204,21,.15);color:#fde68a;border:1px solid rgba(250,204,21,.4);padding:4px 8px;border-radius:999px;font-size:12px}
+    .body{padding:12px 14px}
+    .title{font-weight:600;margin:0 0 6px}
+    .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center}
+    .empty{opacity:.8;border:1px dashed #334155; border-radius:16px; padding:32px; text-align:center}
+    footer{margin:28px 0 10px; color:var(--muted); font-size:12px}
+    .accent{color:var(--accent)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 2l9 5-9 5-9-5 9-5zm0 7l7.5-4.167M12 12l9-5v5l-9 5-9-5V7l9 5z" stroke="#7dd3fc" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <h1>창원남중학교를 소개합니다.</h1>
+          <div class="badge">홍보영상</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <input id="q" type="search" placeholder="제목/설명 검색" aria-label="검색" />
+        <select id="sort">
+          <option value="newest">최신순</option>
+          <option value="oldest">오래된순</option>
+          <option value="title">제목순</option>
+        </select>
+      </div>
+    </header>
+
+    <div id="hero" class="grid" role="list" aria-label="대표 영상 영역"></div>
+    <div id="grid" class="grid" role="list" aria-label="일반 영상 목록"></div>
+    <div id="empty" class="empty" hidden>아직 업로드된 영상이 없습니다. 상단의 <span class="accent">videos</span> 데이터에 항목을 추가하면 즉시 반영됩니다.</div>
+
+    <footer>
+      <div>© <span id="year"></span> (51508) 경상남도 창원시 성산구 창원대로 813 (외동, 창원남고등학교, 창원남중학교) 교무실: 055-289-6957~8 행정실: 055-289-6959 FAX: 055-289-6961
+Copyright (C) 창원남중학교 all rights reserved.</div>
+      <div>관리 방법: 이 파일 상단의 <span class="accent">videos</span> 목록만 수정해 저장하세요. (GitHub Pages/Netlify/학교웹서버 어디서든 호스팅 가능)</div>
+    </footer>
+  </div>
+
+  <script>
+    // 간단한 디버그 영역 (오류가 나면 화면에 표시)
+    const _debug = (msg)=>{
+      let el = document.getElementById('debug');
+      if(!el){
+        el = document.createElement('div');
+        el.id = 'debug';
+        el.style.cssText = 'margin:12px 0;padding:10px;border:1px dashed #f59e0b;color:#fcd34d;background:rgba(245,158,11,.1);font-size:12px;';
+        document.querySelector('.wrap').insertBefore(el, document.querySelector('footer'));
+      }
+      el.textContent = '[오류] ' + msg;
+    };
+
+    const videos = [
+      { id: "2025 학교 홍보 영상.mp4", type: "mp4", title: "2025 학교 홍보 영상", date: "2025-09-09", description: "학교 전반을 소개하는 홍보 영상", pinned: true },
+      { id: "2025 체육행사 3분 영상.mp4", type: "mp4", title: "2025 체육행사 하이라이트", date: "2025-09-09", description: "체육행사의 즐거운 순간들을 담은 3분 영상" },
+      { id: "video3.mp4", type: "mp4", title: "영상 3", date: "2025-09-01", description: "추가 홍보 영상 3" },
+      { id: "video4.mp4", type: "mp4", title: "영상 4", date: "2025-08-28", description: "추가 홍보 영상 4" },
+      { id: "video5.mp4", type: "mp4", title: "영상 5", date: "2025-08-20", description: "추가 홍보 영상 5" },
+      { id: "video6.mp4", type: "mp4", title: "영상 6", date: "2025-08-15", description: "추가 홍보 영상 6" },
+      { id: "video7.mp4", type: "mp4", title: "영상 7", date: "2025-08-10", description: "추가 홍보 영상 7" }
+    ];
+
+    function normalize(str){ return (str||'').toString().toLowerCase(); }
+
+    function renderHero(item){
+      try{
+        const hero = document.getElementById('hero');
+        hero.innerHTML = '';
+        if(!item){ return; }
+        const card = document.createElement('article');
+        card.className = 'card hero-card';
+        const thumb = document.createElement('div');
+        thumb.className='thumb';
+        const src = encodeURI(item.id||'');
+        thumb.innerHTML = `<video controls playsinline preload="metadata"><source src="${src}" type="video/mp4" />브라우저에서 동영상이 재생되지 않으면 다른 브라우저를 사용해 보세요.</video>`;
+        if(item.pinned){
+          const pin = document.createElement('div');
+          pin.className='pin';
+          pin.textContent='대표';
+          thumb.appendChild(pin);
+        }
+        const body = document.createElement('div');
+        body.className='body';
+        const title = document.createElement('h3');
+        title.className='title';
+        title.textContent=item.title||'';
+        const meta = document.createElement('div');
+        meta.className='meta';
+        meta.innerHTML = (item.date? `<span>업데이트: ${item.date}</span>` : '') + (item.description? `<span>·</span><span>${item.description}</span>` : '');
+        body.append(title, meta);
+        card.append(thumb, body);
+        hero.append(card);
+      }catch(e){ _debug(e.message); }
+    }
+
+    function renderList(list){
+      try{
+        const grid = document.getElementById('grid');
+        const empty = document.getElementById('empty');
+        grid.innerHTML = '';
+        if(!list.length){ empty.hidden = false; return; } else { empty.hidden = true; }
+        for(const v of list){
+          const card = document.createElement('article');
+          card.className = 'card';
+          const thumb = document.createElement('div');
+          thumb.className='thumb';
+          const src = encodeURI(v.id||'');
+          if(src){
+            thumb.innerHTML = `<video controls playsinline preload="metadata"><source src="${src}" type="video/mp4" />브라우저에서 동영상이 재생되지 않으면 다른 브라우저를 사용해 보세요.</video>`;
+          } else {
+            thumb.style.display='grid'; thumb.style.placeItems='center';
+            thumb.innerHTML = `<div style="opacity:.8; font-size:14px; color:var(--muted);">업로드 예정</div>`;
+          }
+          const body = document.createElement('div');
+          body.className='body';
+          const title = document.createElement('h3');
+          title.className='title';
+          title.textContent=v.title||'';
+          const meta = document.createElement('div');
+          meta.className='meta';
+          meta.innerHTML = (v.date? `<span>업데이트: ${v.date}</span>` : '') + (v.description? `<span>·</span><span>${v.description}</span>` : '');
+          body.append(title, meta);
+          card.append(thumb, body);
+          grid.append(card);
+        }
+      }catch(e){ _debug(e.message); }
+    }
+
+    function apply(){
+      try{
+        const q = document.getElementById('q');
+        const sortSel = document.getElementById('sort');
+        let list = [...videos];
+        const term = normalize(q && q.value);
+        const mode = sortSel ? sortSel.value : 'newest';
+        list.sort((a,b)=>{
+          const pinDiff = (b.pinned?1:0) - (a.pinned?1:0);
+          if(pinDiff) return pinDiff;
+          if(mode==='newest') return (b.date||'').localeCompare(a.date||'');
+          if(mode==='oldest') return (a.date||'').localeCompare(b.date||'');
+          if(mode==='title') return (a.title||'').localeCompare(b.title||'');
+          return 0;
+        });
+        if(term){
+          list = list.filter(v=> normalize(v.title).includes(term) || normalize(v.description).includes(term));
+        }
+        const heroItem = list[0];
+        const rest = list.slice(1);
+        renderHero(heroItem);
+        renderList(rest);
+      }catch(e){ _debug(e.message); }
+    }
+
+    window.addEventListener('DOMContentLoaded', ()=>{
+      try{ document.getElementById('year').textContent = new Date().getFullYear(); }catch(e){ _debug(e.message); }
+      const q = document.getElementById('q');
+      const sortSel = document.getElementById('sort');
+      q && q.addEventListener('input', apply);
+      sortSel && sortSel.addEventListener('change', apply);
+      apply();
+    });
+  </script>
+</body>
+</html>
